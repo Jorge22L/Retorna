@@ -1,0 +1,25 @@
+---
+import { getDb } from '@/lib/db/client';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+let dbStatus = 'desconocido';
+let migrationsCount = 0;
+
+try {
+  const db = getDb();
+  const result = await db.execute('SELECT COUNT(*) as count FROM _migrations');
+  migrationsCount = Number(result.rows[0]?.count || 0);
+  dbStatus = 'conectado';
+} catch (_err) {
+  dbStatus = 'error';
+  console.error('Error de conexión: ', _err);
+}
+---
+
+<BaseLayout title="Sistema de Bebidas - Inicio">
+  <main style="max-width: 800px; margin: 2rem auto; padding: 2rem; font-family: system-ui, sans-serif;">
+    <h1>🥤 Sistema de Bebidas Gaseosas</h1>
+    <p>Estado de la base de datos: <strong style="color: {dbStatus === 'conectado' ? 'green' : 'red'}">{dbStatus}</strong></p>
+    <p>Migraciones aplicadas: <strong>{migrationsCount}</strong></p>
+  </main>
+</BaseLayout>
