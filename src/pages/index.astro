@@ -17,9 +17,61 @@ try {
 ---
 
 <BaseLayout title="Sistema de Bebidas - Inicio">
-  <main style="max-width: 800px; margin: 2rem auto; padding: 2rem; font-family: system-ui, sans-serif;">
-    <h1>🥤 Sistema de Bebidas Gaseosas</h1>
-    <p>Estado de la base de datos: <strong style="color: {dbStatus === 'conectado' ? 'green' : 'red'}">{dbStatus}</strong></p>
-    <p>Migraciones aplicadas: <strong>{migrationsCount}</strong></p>
+  <main class="max-w-4xl mx-auto p-6 md:p-8">
+    <!-- Tarjeta principal con la paleta aplicada -->
+    <div class="bg-surface rounded-xl shadow-sm border border-border p-6 md:p-8">
+      
+      <!-- Encabezado -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-primary/10 rounded-lg">
+          <span class="text-2xl">🥤</span>
+        </div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold text-text-main">Sistema de Bebidas Gaseosas</h1>
+          <p class="text-text-secondary mt-1">Control interno de inventario, ventas y rentabilidad</p>
+        </div>
+      </div>
+
+      <!-- Estado del sistema -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="flex items-center justify-between p-4 bg-background rounded-lg border border-border">
+          <span class="font-semibold text-text-main">Base de datos</span>
+          <span class={dbStatus === 'conectado' ? 'text-success font-bold flex items-center gap-1' : 'text-error font-bold flex items-center gap-1'}>
+            <span class="w-2 h-2 rounded-full bg-current"></span>
+            {dbStatus === 'conectado' ? 'Conectado' : 'Error'}
+          </span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-background rounded-lg border border-border">
+          <span class="font-semibold text-text-main">Migraciones aplicadas</span>
+          <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-bold">
+            {migrationsCount}
+          </span>
+        </div>
+      </div>
+
+      <!-- Próximos pasos -->
+      <div class="p-5 bg-background/50 rounded-lg border border-border">
+        <h2 class="text-lg font-semibold text-text-main mb-3 flex items-center gap-2">
+          <span class="text-accent">⚡</span> Próximos pasos
+        </h2>
+        <ol class="list-decimal list-inside space-y-2 text-text-secondary">
+          <li>Crear migración inicial: <code class="bg-surface border border-border px-1.5 py-0.5 rounded text-sm text-primary-dark font-mono">migrations/001_initial.sql</code></li>
+          <li>Ejecutar migraciones: <code class="bg-surface border border-border px-1.5 py-0.5 rounded text-sm text-primary-dark font-mono">pnpm db:migrate</code></li>
+          <li>Implementar módulo de autenticación y roles.</li>
+        </ol>
+      </div>
+
+      <!-- Botón de acción (Ejemplo de uso de colores primarios) -->
+      <div class="mt-6 flex gap-3">
+        <button class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-surface font-semibold rounded-lg transition-colors shadow-sm">
+          Continuar con la configuración
+        </button>
+        <button class="px-5 py-2.5 bg-surface hover:bg-background text-text-main font-semibold rounded-lg border border-border transition-colors">
+          Ver documentación
+        </button>
+      </div>
+
+    </div>
   </main>
 </BaseLayout>

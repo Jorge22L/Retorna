@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  /* ==========================================
+     PALETA PRINCIPAL
+     ========================================== */
+  --color-primary: #0F766E;        /* Verde esmeralda */
+  --color-primary-dark: #115E59;   /* Verde petróleo */
+  --color-secondary: #0284C7;      /* Azul frío */
+  --color-accent: #F59E0B;         /* Amarillo cálido */
+
+  /* ==========================================
+     FONDOS Y SUPERFICIES
+     ========================================== */
+  --color-background: #F8FAFC;     /* Gris muy claro */
+  --color-surface: #FFFFFF;        /* Blanco */
+
+  /* ==========================================
+     TEXTOS Y BORDES
+     ========================================== */
+  --color-text-main: #1E293B;      /* Gris oscuro */
+  --color-text-secondary: #64748B; /* Gris medio */
+  --color-border: #E2E8F0;         /* Gris suave */
+
+  /* ==========================================
+     COLORES DE ESTADO
+     ========================================== */
+  --color-success: #16A34A;        /* Verde */
+  --color-warning: #EA580C;        /* Naranja */
+  --color-error: #DC2626;          /* Rojo */
+  --color-info: #2563EB;           /* Azul */
+  --color-pending: #7C3AED;        /* Violeta (Sincronización pendiente) */
+
+  /* ==========================================
+     TIPOGRAFÍA
+     ========================================== */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ==========================================
+   ESTILOS BASE GLOBALES
+   ========================================== */
+body {
+  @apply bg-background text-text-main font-sans antialiased;
+}
+
+/* Mejora visual de scrollbars para una experiencia más pulida */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-text-secondary;
+}
