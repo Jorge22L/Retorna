@@ -1,77 +1,84 @@
 ---
-import { getDb } from '@/lib/db/client';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-let dbStatus = 'desconocido';
-let migrationsCount = 0;
+const errorParam = Astro.url.searchParams.get('error');
 
-try {
-  const db = getDb();
-  const result = await db.execute('SELECT COUNT(*) as count FROM _migrations');
-  migrationsCount = Number(result.rows[0]?.count || 0);
-  dbStatus = 'conectado';
-} catch (_err) {
-  dbStatus = 'error';
-  console.error('Error de conexión: ', _err);
-}
+const errorMessages: Record<string, string> = {
+  invalid_credentials: 'Usuario o contraseña incorrectos.',
+  user_inactive: 'El usuario está inactivo. Contacta al administrador.',
+  validation_error: 'Los datos ingresados no son válidos.',
+};
+
+const errorMessage = errorParam ? errorMessages[errorParam] ?? 'Ocurrió un error.' : null;
 ---
 
-<BaseLayout title="Sistema de Bebidas - Inicio">
-  <main class="max-w-4xl mx-auto p-6 md:p-8">
-    <!-- Tarjeta principal con la paleta aplicada -->
-    <div class="bg-surface rounded-xl shadow-sm border border-border p-6 md:p-8">
-      
-      <!-- Encabezado -->
-      <div class="flex items-center gap-3 mb-6">
-        <div class="p-3 bg-primary/10 rounded-lg">
-          <span class="text-2xl">🥤</span>
-        </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-text-main">Sistema de Bebidas Gaseosas</h1>
-          <p class="text-text-secondary mt-1">Control interno de inventario, ventas y rentabilidad</p>
-        </div>
-      </div>
-
-      <!-- Estado del sistema -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="flex items-center justify-between p-4 bg-background rounded-lg border border-border">
-          <span class="font-semibold text-text-main">Base de datos</span>
-          <span class={dbStatus === 'conectado' ? 'text-success font-bold flex items-center gap-1' : 'text-error font-bold flex items-center gap-1'}>
-            <span class="w-2 h-2 rounded-full bg-current"></span>
-            {dbStatus === 'conectado' ? 'Conectado' : 'Error'}
-          </span>
+<BaseLayout title="Iniciar sesión">
+  <main class="min-h-screen flex items-center justify-center bg-background px-4 py-8">
+    <div class="w-full max-w-md">
+      <div class="bg-surface rounded-xl shadow-sm border border-border p-8">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-xl mb-4">
+            <span class="text-3xl">🥤</span>
+          </div>
+          <h1 class="text-2xl font-bold text-text-main">Sistema de Bebidas</h1>
+          <p class="text-text-secondary mt-1 text-sm">Ingresa tus credenciales para continuar</p>
         </div>
 
-        <div class="flex items-center justify-between p-4 bg-background rounded-lg border border-border">
-          <span class="font-semibold text-text-main">Migraciones aplicadas</span>
-          <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-bold">
-            {migrationsCount}
-          </span>
-        </div>
+        {errorMessage && (
+          <div class="mb-6 p-3 bg-error/10 border border-error/30 text-error rounded-lg text-sm flex items-start gap-2">
+            <span class="text-lg leading-none">⚠️</span>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        <form method="POST" action="/api/auth/login" class="space-y-4">
+          <div>
+            <label for="username" class="block text-sm font-medium text-text-main mb-1.5">
+              Usuario
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              autocomplete="username"
+              autofocus
+              class="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-text-main placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
+              placeholder="admin"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-text-main mb-1.5">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              class="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-text-main placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            class="w-full py-2.5 bg-primary hover:bg-primary-dark text-surface font-semibold rounded-lg transition-colors shadow-sm"
+          >
+            Iniciar sesión
+          </button>
+        </form>
+
+        <p class="text-center text-xs text-text-secondary mt-6">
+          Acceso exclusivo para personal autorizado.
+        </p>
       </div>
 
-      <!-- Próximos pasos -->
-      <div class="p-5 bg-background/50 rounded-lg border border-border">
-        <h2 class="text-lg font-semibold text-text-main mb-3 flex items-center gap-2">
-          <span class="text-accent">⚡</span> Próximos pasos
-        </h2>
-        <ol class="list-decimal list-inside space-y-2 text-text-secondary">
-          <li>Crear migración inicial: <code class="bg-surface border border-border px-1.5 py-0.5 rounded text-sm text-primary-dark font-mono">migrations/001_initial.sql</code></li>
-          <li>Ejecutar migraciones: <code class="bg-surface border border-border px-1.5 py-0.5 rounded text-sm text-primary-dark font-mono">pnpm db:migrate</code></li>
-          <li>Implementar módulo de autenticación y roles.</li>
-        </ol>
-      </div>
-
-      <!-- Botón de acción (Ejemplo de uso de colores primarios) -->
-      <div class="mt-6 flex gap-3">
-        <button class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-surface font-semibold rounded-lg transition-colors shadow-sm">
-          Continuar con la configuración
-        </button>
-        <button class="px-5 py-2.5 bg-surface hover:bg-background text-text-main font-semibold rounded-lg border border-border transition-colors">
-          Ver documentación
-        </button>
-      </div>
-
+      <p class="text-center text-xs text-text-secondary mt-4">
+        © {new Date().getFullYear()} — Sistema interno
+      </p>
     </div>
   </main>
 </BaseLayout>

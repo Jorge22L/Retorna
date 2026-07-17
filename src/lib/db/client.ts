@@ -1,19 +1,13 @@
-import { type Client, createClient } from '@libsql/client';
+import { createClient } from '@libsql/client';
 import { env } from '../../env';
 
-let _client: Client | null = null;
-
-export function getDb(): Client {
-  if (!_client) {
-    _client = createClient({
-      url: env.TURSO_URL,
-      authToken: env.TURSO_AUTH_TOKEN || undefined,
-    });
-  }
-  return _client;
-}
-
-// Proxy para acceso directo
-export const db = new Proxy({} as Client, {
-  get: (_, prop) => Reflect.get(getDb(), prop),
+// Inicialización directa y segura del cliente
+export const db = createClient({
+  url: env.TURSO_URL,
+  authToken: env.TURSO_AUTH_TOKEN || undefined,
 });
+
+// Si en el futuro necesitas una función getter por alguna razón:
+export function getDb() {
+  return db;
+}
