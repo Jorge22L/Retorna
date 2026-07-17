@@ -1,7 +1,7 @@
 import { verify } from '@node-rs/argon2';
 import { loginSchema, type LoginInput } from '../validators/auth.schema';
 import { findByUsername, updateLastLogin, type UserWithRoles } from '../repositories/userRepo';
-import { createSession, type Session } from '../security/session';
+import { createSession, revokeSession, type Session } from '../security/session';
 import { logAudit } from '../utils/audit';
 import { db } from '../db/client';
 
@@ -119,4 +119,19 @@ export async function login(
   });
 
   return { success: true, user, session };
+}
+
+export async function logout(sessionId: string, userId: string, context: LoginContext = {}): Promise<void>{
+  await revokeSession(sessionId);
+
+  await logAudit({
+    userId,
+    action: 'LOGOUT',
+    module: 'auth',
+    entityType: 'session',
+    entityId: sessionId,
+    ipAddress: context.ipAddress,
+    userAgent: context.userAgent,
+    result: 'SUCCESS',
+  });
 }

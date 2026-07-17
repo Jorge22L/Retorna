@@ -1,5 +1,6 @@
 import type { APIContext } from "astro";
 import { login } from "@/lib/services/authService";
+import { revokeSession } from "@/lib/security/session";
 import { error } from "node:console";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -38,6 +39,13 @@ export async function POST(context: APIContext): Promise<Response> {
     "unknown";
   const userAgent = request.headers.get("user-agent") ?? "unknown";
 
+  // @TODO: Revisar
+  // Invalidar sesiones anteriores del mismo usuario (opcional, mejora de seguridad)
+  await db.execute({
+    sql: `UPDATE sessions SET is_revoked = 1 WHERE user_id = ? AND is_revoked = 0`,
+    args: [user.id],
+  });
+
   console.log("🔵 [LOGIN] Llamando al servicio de login...");
   const result = await login({ username, password }, { ipAddress, userAgent });
   console.log(
@@ -46,20 +54,20 @@ export async function POST(context: APIContext): Promise<Response> {
   );
 
   if (!result.success) {
-    console.log('🟡 [LOGIN] Redirigiendo con error:', result.reason);
+    console.log("🟡 [LOGIN] Redirigiendo con error:", result.reason);
     return redirect(`/login?error=${result.reason}`, 303);
   }
 
-  console.log('🟢 [LOGIN] Configurando cookie de sesión...');
+  console.log("🟢 [LOGIN] Configurando cookie de sesión...");
   const isProd = import.meta.env.PROD;
-  cookies.set('session_id', result.session.id, {
+  cookies.set("session_id", result.session.id, {
     httpOnly: true,
     secure: isProd,
-    sameSite: 'lax',
-    path: '/',
+    sameSite: "lax",
+    path: "/",
     expires: result.session.expiresAt,
   });
 
-  console.log('🟢 [LOGIN] Redirigiendo a /');
-  return redirect('/', 303);
+  console.log("🟢 [LOGIN] Redirigiendo a /");
+  return redirect("/", 303);
 }
